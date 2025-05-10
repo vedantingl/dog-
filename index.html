@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Talking Dog Game</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(to bottom, #87CEEB, #FFD700);
+      font-family: Arial, sans-serif;
+    }
+    canvas {
+      border: 2px solid #333;
+      background: #FFF;
+    }
+    #buttons {
+      position: absolute;
+      bottom: 20px;
+      display: flex;
+      gap: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+    button:hover {
+      background: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <div id="buttons">
+    <button onclick="dog.feed()">Feed</button>
+    <button onclick="dog.pet()">Pet</button>
+    <button onclick="dog.play()">Play</button>
+  </div>
+<script>
+let dog;
+
+function setup() {
+  createCanvas(400, 400);
+  dog = new Dog();
+}
+
+function draw() {
+  background(255);
+  dog.update();
+  dog.show();
+  // Display action text
+  textAlign(CENTER);
+  textSize(20);
+  fill(0);
+  text(dog.actionText, width / 2, 50);
+}
+
+function mousePressed() {
+  if (mouseX > dog.x - 50 && mouseX < dog.x + 50 && mouseY > dog.y - 100 && mouseY < dog.y) {
+    dog.bark();
+  }
+}
+
+class Dog {
+  constructor() {
+    this.x = width / 2;
+    this.y = height - 50;
+    this.state = 'idle';
+    this.timer = 0;
+    this.actionText = '';
+    this.wagAngle = 0;
+  }
+
+  update() {
+    if (this.state !== 'idle') {
+      this.timer--;
+      if (this.timer <= 0) {
+        this.state = 'idle';
+        this.actionText = '';
+      }
+    }
+    if (this.state === 'pet' || this.state === 'play') {
+      this.wagAngle += 0.2;
+    }
+  }
+
+  show() {
+    push();
+    translate(this.x, this.y);
+    // Draw dog body
+    fill(139, 69, 19); // Brown fur
+    ellipse(0, -50, 80, 100); // Head
+    ellipse(0, 0, 100, 80); // Body
+    // Ears
+    triangle(-30, -80, -50, -100, -20, -100);
+    triangle(30, -80, 50, -100, 20, -100);
+    // Eyes
+    fill(255);
+    ellipse(-20, -60, 20, 20);
+    ellipse(20, -60, 20, 20);
+    fill(0);
+    ellipse(this.state === 'happy' ? -20 : -18, this.state === 'happy' ? -60 : -58, 10, 10);
+    ellipse(this.state === 'happy' ? 20 : 18, this.state === 'happy' ? -60 : -58, 10, 10);
+    // Nose
+    fill(0);
+    ellipse(0, -50, 10, 10);
+    // Tail
+    push();
+    rotate(sin(this.wagAngle) * 0.3);
+    rect(40, 0, 30, 10);
+    pop();
+    // Legs
+    fill(139, 69, 19);
+    rect(-30, 10, 20, 30);
+    rect(10, 10, 20, 30);
+    pop();
+  }
+
+  bark() {
+    this.state = 'bark';
+    this.timer = 30;
+    this.actionText = "Woof!";
+  }
+
+  feed() {
+    this.state = 'eat';
+    this.timer = 60;
+    this.actionText = "Yum!";
+  }
+
+  pet() {
+    this.state = 'happy';
+    this.timer = 60;
+    this.actionText = "So happy!";
+  }
+
+  play() {
+    this.state = 'play';
+    this.timer = 60;
+    this.actionText = "Fun time!";
+  }
+}
+</script>
+</body>
+</html>
